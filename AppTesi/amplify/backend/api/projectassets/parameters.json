@@ -1,0 +1,6 @@
+{
+  "AppSyncApiName": "projectassets",
+  "DynamoDBBillingMode": "PAY_PER_REQUEST",
+  "DynamoDBEnableServerSideEncryption": false,
+  "AuthModeLastUpdated": "2025-06-27T14:10:12.874Z"
+}

@@ -1,0 +1,14 @@
+{
+  "resourceName": "SketchToCodeStorage",
+  "policyUUID": "503530d4",
+  "bucketName": "users-sketches-for-finetuning",
+  "storageAccess": "auth",
+  "guestAccess": [],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "NONE",
+  "groupAccess": {}
+}
