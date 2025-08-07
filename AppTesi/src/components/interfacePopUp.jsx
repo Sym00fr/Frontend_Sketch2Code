@@ -4,6 +4,8 @@ import { useEffect, useState } from "react"
 import { IoMdClose } from "react-icons/io";
 import { InterfacePreview } from "./interfacePreview";
 import { TiWarning } from "react-icons/ti";
+import { FaCheck } from "react-icons/fa";
+
 
 
 const InterfacePopup = (props) => {
@@ -233,7 +235,7 @@ const name = temp.split('-')[3]
 
 const SendStylePopUp = (props) =>{
 
-    const {setIsSendPopUp, savedImages, setUserParametersPath, setMode} = props
+    const {setIsSendPopUp, savedImages, setUserParametersPath, setMode, SendNewStyle, isCheckingS3} = props
 
     const [tempName, setTempName]  = useState('');
     const [invalid, setinvalid] = useState(false);
@@ -292,23 +294,15 @@ const SendStylePopUp = (props) =>{
         }
         else{
             console.log('sending');
-            //SendSketchesForFinetuning(tempName);
-
-            const newPath = 'prova2@prova.com/peftmodel-checkpoint-local-' + tempName;
-        
-            //aggiungiamo lo stile (in locale) agli stili
-            setUserParametersPath((prevStyles) => [...prevStyles, newPath]);
-
-            setIsSendPopUp(false); 
-            setMode('sketch'); 
-            navigate('/')
+            SendNewStyle(tempName);
         }
         
     }
 
    return(<>
+   {/*No checking dei parametri */}
     <div className="w-full h-full absolute z-20 bg-gray-100" style={{opacity: 0.5}}></div>
-    <div className="absolute z-20 bg-gray-300 rounded-2xl border-2 border-gray-700 shadow-2xl rounded-2xl p-2" style={{top: 200, left: 500, width: 550}}>
+    {!isCheckingS3.checking && !isCheckingS3.completed && <div className="absolute z-20 bg-gray-300 rounded-2xl border-2 border-gray-700 shadow-2xl rounded-2xl p-2" style={{top: 200, left: 500, width: 550}}>
         <div className=" flex-col">
             <Button className="text-gray-900 bg-gray-200 border-black border-2 "  size="sm"  onPress={()=>setIsSendPopUp(false)}><IoMdClose size={19}/></Button>
             <h1 className="text-gray-600 p-5 text-2xl font-bmedium " >Name Your Style</h1>
@@ -324,7 +318,38 @@ const SendStylePopUp = (props) =>{
                 <Button className=' w-[100px] text-md text-gray-200 bg-gray-500 border-gray-200 border-2' isDisabled = {invalid || emptyCanvas} onPress={()=>{send()}}  >Submit</Button>
             </div>
              
-        </div></>
+    </div>}
+    {/*checking dei parametri caricati*/}
+    {isCheckingS3.checking && !isCheckingS3.completed && <div className="absolute z-20 bg-gray-300 rounded-2xl border-2 border-gray-700 shadow-2xl rounded-2xl p-2 " style={{top: 200, left: 500, width: 550}}>
+        <div className=" flex flex-col items-center justify-center">
+            <h1 className="text-gray-600 p-5 text-2xl font-bmedium " >Your style is being processed</h1>
+        </div>
+        <div className="p-3 flex items-center justify-center">
+            <img src='src\assets\loading.gif' className="w-[150px] h-[150px]" ></img>
+        </div>
+        <h2 className="bg-gray-200 rounded-large p-5 border-gray-700 border-1 text-gray-700 ">This process may take some time. You will receive a notification when your stile is avaiable </h2>
+        <div className=" flex flex-col p-4 space-y-4 items-center justify-center">
+                <Button className=' w-[100px] text-md text-gray-200 bg-gray-500 border-gray-200 border-2' onPress={()=>{setIsSendPopUp(false); setMode('sketch'); navigate('/')}}  >Continue </Button>
+        </div>
+             
+    </div>
+    }
+     {/*parametri caricati*/}
+    {!isCheckingS3.checking && isCheckingS3.completed && <div className="absolute z-20 bg-gray-300 rounded-2xl border-2 border-gray-700 shadow-2xl rounded-2xl p-2 " style={{top: 200, left: 500, width: 550}}>
+        <div className=" flex flex-col items-center justify-center">
+            <h1 className="text-gray-600 p-5 text-2xl font-bmedium " >Your style is Ready!</h1>
+        </div>
+        <div className="p-3 flex items-center justify-center">
+          < FaCheck size={80}/>
+        </div>
+        <div className=" flex flex-col p-4 space-y-4 items-center justify-center">
+                <Button className=' w-[100px] text-md text-gray-200 bg-gray-500 border-gray-200 border-2' onPress={()=>{setIsSendPopUp(false); setMode('sketch'); navigate('/')}}  >Continue </Button>
+        </div>
+             
+    </div>
+    }
+        
+    </>
         
     ) 
 }

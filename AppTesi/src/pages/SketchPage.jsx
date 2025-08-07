@@ -6,7 +6,8 @@ import { InterfacePopup, NewUserPopUp, PersonalPopUp, ChooseStylePopUp } from ".
 import SimpleCanvas from "../components/SimpleCanvas";
 import { callOpenAIapi, parseApiResponse } from "../api/OpenAI_api";
 import { sketchToUpload } from "../assets/SktechURL_to_Upload";
-
+import { UploadSketchesOnS3 } from "../api/api_S3";
+import { triggerSketchConversion } from "../api/api";
 
 //import { postPrompt, get_path, create_entry, GetAllUsers, GetUserFromDb } from "../api/api";
 
@@ -25,7 +26,7 @@ export const SketchPage = (props) => {
 
   const {signOut, email, mode, setMode,  userParametersPath, 
     userType,  firstUsePopUp, setFirstUsePopUp, style, setStyle, personalPopUp, setPersonalPopup,
-  firstPopUp, setFirstPopUp } = props
+  firstPopUp, setFirstPopUp, isCheckingS3, setIsCheckingS3 } = props
 
  //const [style, setStyle] = useState('default');
 
@@ -57,57 +58,7 @@ export const SketchPage = (props) => {
 
   const [isGenerated, setIsGenerated] = useState(false);
 
-
-  //const [img, setImg] = useState(`url("/src/assets/sample_${1}.png")`);
-
-  const stringToArray = (inputString) => {
-  const content = inputString.slice(1, -1);
-  return paths;
-  
-}
     
-  /*useEffect(()=>{
-    //controlliamo se l'utente è in database
-    const checkDB = async(usermail)  => {
-      const user  =  await GetUserFromDb(usermail)
-      if (user == false){
-        console.log("utente non in database")
-        setUserType('absent');
-        setFirstUsePopUp(true);
-        SetFirstUse(true)
-        //aggiungiamo l'utent al database
-        const res2 =  await create_entry(usermail);
-        //console.log("utente aggiunto al db");        
-      }
-      else {
-        //console.log("utente già in db")
-
-        ///controlliamo se ha dei parametri già salvati
-        let parametersPath = await get_path(usermail)  //prende l'user email internamente, non serve passarglielo, ritorna null se l'utente non esiste (controllo ridondante), false se non c'è path
-        if (parametersPath !=false){
-          console.log(parametersPath)
-          setUserParametersPath(stringToArray(parametersPath));
-
-          setUserType('advanced');
-          setStyle('default');
-
-        }
-        else{
-          //console.log("Nessun parametro salvato")
-          setUserType('new');
-          setPersonalPopup(true);
-          SetFirstUse(true)
-          setStyle('default');
-
-        }
-      }
-    }
-   
-    setMode('sketch');
-    checkDB(email)
-    //canvasBoardRef.current.loadImg(sketchToUpload)
-
-  }, [])*/
 
   useEffect(()=>{
     loadCanvas();
@@ -125,12 +76,20 @@ export const SketchPage = (props) => {
    canvasBoardRef.current.loadImg(savedImage)
   }
 
-  const generate = async () =>{
+  function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
+  }
+  
+
+  const generateOpenAI = async () =>{
     
     //const currentCanvasData = canvasBoardRef.current.exportImgDataURL();
     setLoading(true);
-
-    //console.log(res);
 
     canvasBoardRef.current.loadImg(sketchToUpload);
 
@@ -148,7 +107,38 @@ export const SketchPage = (props) => {
 
     setIsGenerated(true);
 
+  }
+
+
+
+  const generate = async () =>{
+
+    //cancella lei lo sketch da s3?
+    console.log(style)
     
+    /*setLoading(true);
+
+    const currentCanvasData = canvasBoardRef.current.exportImgDataURL();
+    //carichiamo l'immagine su s3
+    const path = `public/${email}/temp/Sketch_to_convert.png`
+
+    const ok = UploadSketchesOnS3(dataURLtoBlob(currentCanvasData), path);
+    if(ok){
+      console.log('sketch uploaded')
+      const res = triggerSketchConversion(email, style)
+
+    }else{
+      console.log('errore nel caricamento dello skecth')
+    }
+    
+
+    
+
+    setLoading(false);
+
+    //setGeneratedHtml({html: htmlCode, css: CssCode});
+
+    setIsGenerated(true);*/
 
   }
 
@@ -161,7 +151,8 @@ export const SketchPage = (props) => {
     <div className= " w-full h-screen flex flex-col bg-header bg-gray-100"  >
       
         <UpperBar style = {style} user = {email} signOut = {signOut} userType = {userType}  mode = {mode} setMode = {setMode} 
-                  userParametersPath={userParametersPath} setChooseStylePopUp = {setChooseStylePopUp} setStyle= {setStyle}/>
+                  userParametersPath={userParametersPath} setChooseStylePopUp = {setChooseStylePopUp} setStyle= {setStyle} 
+                  isCheckingS3 = {isCheckingS3} setIsCheckingS3 =  {setIsCheckingS3}/>
 
         <LowerBar setLeftCanvas = {setCanvasOnTheLeft}  canvasOnTheLeft = {canvasOnTheLeft} saveCanvas={saveCanvas} 
            stylePath = {style} generate = {generate} isGenerated = {isGenerated}/>

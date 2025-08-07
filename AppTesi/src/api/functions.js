@@ -1,10 +1,10 @@
 
-import { postPrompt, get_path, create_entry, GetAllUsers, GetUserFromDb, triggerNotebook, update_entry_add_path, update_entry_delete_path} from "../api/api";
+import { get_path,triggerNotebook, update_entry_add_path} from "../api/api";
 
 async function FinetuneModelProva(setResponse, userEmail) {
      
     let res = await get_path()
-
+   
     if (res == 'utente non trovato'){
        setResponse("Errore, l'utente non esiste nel database" )
     } 

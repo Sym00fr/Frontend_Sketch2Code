@@ -1,15 +1,15 @@
 {
   "api": {
-    "projectassets": {
+    "GraphQLSkeych2Code": {
       "dependsOn": [],
       "output": {
         "authConfig": {
           "additionalAuthenticationProviders": [],
           "defaultAuthentication": {
             "apiKeyConfig": {
-              "apiKeyExpirationDate": "2026-04-23T14:35:16.713Z",
+              "apiKeyExpirationDate": "2026-05-20T09:41:31.274Z",
               "apiKeyExpirationDays": 300,
-              "description": "GraphQl Key for sketch to code"
+              "description": "GraphQL sketch2Code api key"
             },
             "authenticationType": "API_KEY"
           }
@@ -47,10 +47,44 @@
       "service": "Cognito"
     }
   },
-  "function": {},
+  "function": {
+    "S3Trigger923ce518": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    }
+  },
+  "parameters": {
+    "AMPLIFY_function_S3Trigger923ce518_deploymentBucketName": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger923ce518"
+        }
+      ]
+    },
+    "AMPLIFY_function_S3Trigger923ce518_s3Key": {
+      "usedBy": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger923ce518"
+        }
+      ]
+    }
+  },
   "storage": {
-    "SketchToCodeStorage": {
-      "dependsOn": [],
+    "s3Storagesketch2code": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "Name",
+            "Arn",
+            "LambdaExecutionRole"
+          ],
+          "category": "function",
+          "resourceName": "S3Trigger923ce518"
+        }
+      ],
       "providerPlugin": "awscloudformation",
       "service": "S3"
     }

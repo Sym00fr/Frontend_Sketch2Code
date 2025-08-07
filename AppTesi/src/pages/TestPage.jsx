@@ -3,13 +3,14 @@
 import {Button, ButtonGroup, Textarea, Card, CardHeader, CardBody, CardFooter, Chip, Divider} from "@heroui/react";
 import { update_entry_add_path } from "../api/api";
 import { callOpenAIapi } from "../api/OpenAI_api";
+import { listObjectOnS3 } from "../api/api_S3";
 
 import { useState, useEffect } from "react";
 
 //import API from 'aws-amplify'
 
 import { post } from 'aws-amplify/api';
-import { postPrompt, get_path, create_entry, GetAllUsers, GetUserFromDb } from "../api/api";
+import { postPrompt, get_path, create_entry, GetAllUsers, GetUserFromDb, update_entry_delete_path } from "../api/api";
 import { FinetuneModelProva } from "../api/functions";
 
 
@@ -75,11 +76,20 @@ useEffect( ()=> {
 
             </div>
 
+  
+              <div>
+              <Button size="lg" radius="lg" className="m-5" onPress={()=>listObjectOnS3("public/prova2@prova.com/style_ciaooo/params")}>Check s3 files </Button>
+            </div>
+
             <div>
               <Button size="lg" radius="lg" className="m-5" onPress={()=>update_entry_add_path(email)}>Aggiorna Db</Button>
-              <Textarea className="m-5 max-w-2xl h-48" label="Your prompt" placeholder="Enter your prompt" onChange={(event) => {setTextPromptDB(event.target.value);}}/>
+            </div>
+
+            <div>
+              <Button size="lg" radius="lg" className="m-5" onPress={()=>update_entry_delete_path(email)}>Elimina path per user</Button>
 
             </div>
+
             <div>
               <Button size="lg" radius="lg" className="m-5" onPress={()=>callOpenAIapi()}>Call OpenAi API</Button>
               

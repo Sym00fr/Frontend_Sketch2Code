@@ -3,31 +3,7 @@ import { getCurrentUser } from "aws-amplify/auth";
 import { client } from "./api-client";
 import { listUsers, getUser } from "../graphql/queries";
 import { createUser, updateUser } from "../graphql/mutations";
-//import { uploadData } from 'aws-amplify/storage';
 
-
-/*import fs from 'fs' //file stream
-import dotenv from 'dotenv'
-
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-
-dotenv.config()
-
-//const accesKey = process.env.AWS_ACCESS_KEY_ID
-//const secretaAccesKey = process.env.AWS_SECRET_ACCESS_KEY
-
-const client = new S3Client();
-const filestream = fs.createReadStream("nome_file");
-
-const input = { //putObject Request
-Bucket : "finetuning-data-bucket",
-Key: "STRING_VALUE",  //nome del file da uplodare
-Body: filestream
-};
-
-
- const command = new PutObjectCommand(input);
- const response = await client.send(command);*/
 
 
 const postPrompt = async (text) => {
@@ -46,8 +22,10 @@ const postPrompt = async (text) => {
         const response = await fetch('https://ucrc2022r2.execute-api.eu-north-1.amazonaws.com/dev/prova', requestOptions);
         const data = await response.json();
         console.log(data);
+        return true;
     } catch (error) {
         console.error('Error:', error);
+        return false
     }
 };
 
@@ -81,6 +59,69 @@ const triggerNotebook = async(email) =>{
         return false
     }
 }
+
+
+const triggerFinetuningForStyleCustomization = async(email, styleName) =>{
+
+    //const email = (await getCurrentUser()).signInDetails.loginId
+
+    console.log("triggering notebook for finetuning " + email);
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+        },
+        mode: "cors",
+        credentials: "same-origin",
+        body: JSON.stringify({
+            "userEmail": email,
+            "styleName": styleName
+         })
+    };
+
+    try {
+        const response = await fetch('https://iuq17zf8pa.execute-api.eu-north-1.amazonaws.com/dev/triggerFinetuning', requestOptions);
+        const data = await response.json();
+        console.log(data);
+        return data
+
+    } catch (error) {
+        console.error('Error:', error);
+        return false
+    }
+}
+
+
+const triggerSketchConversion = async(email, styleName) =>{
+
+    console.log("triggering notebook for code generation for " + email);
+
+    const requestOptions = {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json',
+        },
+        mode: "cors",
+        credentials: "same-origin",
+        body: JSON.stringify({
+            "userEmail": email,
+            "styleName": styleName
+         })
+    };
+
+    try {
+        const response = await fetch('https://iuq17zf8pa.execute-api.eu-north-1.amazonaws.com/dev/Trigger_Code_Generation', requestOptions);
+        const data = await response.json();
+        console.log(data);
+        return data
+
+    } catch (error) {
+        console.error('Error:', error);
+        return false
+    }
+}
+
 
 
 const create_entry = async(email) =>{
@@ -149,21 +190,23 @@ const get_path = async(email) => {
 
 }
 
-const update_entry_add_path = async(email) => {
-    let path = `${email}/peftmodel-checkpoint-local-1`
+const update_entry_add_path = async(email, newPathArray) => {
+    
+    /*let path = `${email}/peftmodel-checkpoint-local-1`
     let path2 = `${email}/peftmodel-checkpoint-local-2`
     let path3 = `${email}/peftmodel-checkpoint-local-3`
 
-    const pathArray = [path, path2, path3];
+    const pathArray = [path, path2, path3];*/
 
-    console.log('updating user: ' + email + ' with path: ' + pathArray)
+    console.log('updating user: ' + email + ' with path: ' + newPathArray)
 
     const result = await client.graphql({
         query: updateUser,
         variables: {
           input: {
             userEmail: email,
-            finetuningParametersPath:  [path, path2, path3]
+            //finetuningParametersPath:  [path, path2, path3]
+            finetuningParametersPath:  newPathArray
           }
         }
       });
@@ -171,28 +214,21 @@ const update_entry_add_path = async(email) => {
 }
 
 const update_entry_delete_path = async(email) => {  //for test
-    let path = `${email}/peftmodel-checkpoint-local`
 
+    console.log('deleting al paths for user: ' + email)
     const result = await client.graphql({
         query: updateUser,
         variables: {
           input: {
             userEmail: email,
-            finetuningParametersPath:  null
+            finetuningParametersPath:  []
           }
         }
       });
       console.log(result);
 }
 
-/*function dataURLtoBlob(dataurl) {
-    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-    while(n--){
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], {type:mime});
-}*/
+
 
   const dataURLtoBlob = (dataurl) => {
     const arr = dataurl.split(',');
@@ -208,7 +244,7 @@ const update_entry_delete_path = async(email) => {  //for test
 
 
 
-async function UploadSketchesOnS3(sketchesDataUrl, email, styleName) {  // formato in image/png
+/*async function UploadSketchesOnS3(sketchesDataUrl, email, styleName) {  // formato in image/png
   
     let i=0;
     for (const sketch of sketchesDataUrl){
@@ -236,12 +272,14 @@ async function UploadSketchesOnS3(sketchesDataUrl, email, styleName) {  // forma
         i++;  
     }
 
-  };
+  };*/
 
 
 
 
 
 
-export {postPrompt, get_path, triggerNotebook, create_entry, GetAllUsers, GetUserFromDb, update_entry_add_path, update_entry_delete_path, UploadSketchesOnS3 }
+export {postPrompt, get_path, triggerNotebook, create_entry, GetAllUsers, 
+    GetUserFromDb, update_entry_add_path, update_entry_delete_path,
+     triggerFinetuningForStyleCustomization, triggerSketchConversion }
 

@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "serviceConfiguration": {
+    "apiName": "GraphQLSkeych2Code",
+    "serviceName": "AppSync",
+    "defaultAuthType": {
+      "mode": "API_KEY",
+      "expirationTime": 300,
+      "apiKeyExpirationDate": "2026-05-20T09:41:31.274Z",
+      "keyDescription": "GraphQL sketch2Code api key"
+    }
+  }
+}

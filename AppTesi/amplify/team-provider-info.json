@@ -15,8 +15,16 @@
       "auth": {
         "projectassetsab2e6716": {}
       },
+      "storage": {
+        "s3Storagesketch2code": {}
+      },
       "api": {
-        "projectassets": {}
+        "GraphQLSkeych2Code": {}
+      },
+      "function": {
+        "S3Trigger923ce518": {
+          "deploymentBucketName": "amplify-projectassets-dev-0f38f-deployment"
+        }
       }
     }
   }

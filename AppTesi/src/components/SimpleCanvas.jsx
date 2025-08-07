@@ -704,7 +704,7 @@ const SimpleCanvas = forwardRef((props, ref) => {
     return {
       // ... your methods ...
       exportImgDataURL: () =>{
-        return canvasRef.current.toDataURL();
+        return canvasRef.current.toDataURL('image/png');
       },
 
       /*exportImgBLOB: () =>{

@@ -3,11 +3,13 @@ import {Dropdown, DropdownTrigger, DropdownMenu, DropdownItem, Button} from "@he
 import { useNavigate } from "react-router-dom";
 import { FiPlus } from "react-icons/fi"
 import { FaRegUser } from "react-icons/fa";
+import { GoDot, GoDotFill } from "react-icons/go";
 
 
 export const UpperBar = (props) => {
 
-    const {style, user, signOut,  userType, mode, setMode, setStyle, setChooseStylePopUp, setLoseStylePopUp, userParametersPath} = props;
+    const {style, user, signOut,  userType, mode, setMode, setStyle, setChooseStylePopUp, 
+        setLoseStylePopUp, userParametersPath, isCheckingS3, setIsCheckingS3 } = props;
     //console.log(userParametersPath)
 
     const boh = [1,2,3];
@@ -19,8 +21,8 @@ export const UpperBar = (props) => {
                 return 'default';
             } else {
                 //console.log(mode);
-                const temp = path.split('/')[1]
-                const name = temp.split('-')[3]
+                const temp = path.split('/')[2]
+                const name = temp.split('_')[1]
                 return name
             }      
         }
@@ -41,13 +43,21 @@ export const UpperBar = (props) => {
                 </Dropdown>*/}
 
             {mode == 'sketch' ? 
-            <Dropdown className="border-2 border-black bg-gray-100">
+            <Dropdown className="border-2 border-black bg-gray-100" onClose={()=>{if(isCheckingS3.completed){setIsCheckingS3({checking: false, path: '', completed: false})}}}>
                     <DropdownTrigger className="flex flex-row justify-center items-center">
-                       <div className="bg-gray-600 w-[270px] rounded-lg border-white border-1">{userParametersPath.length > 0 ? ('Style: ' + pathToName(style)) : ('Personalize style')}</div> 
+                       <div className="bg-gray-600 w-[270px] rounded-lg border-white border-1">
+                            {userParametersPath.length > 0 ? ('Style: ' + pathToName(style)) : ('Personalize style')} 
+                            {isCheckingS3.checking && <GoDot size={20} className="text-green-400"></GoDot>} 
+                            {isCheckingS3.completed && <GoDotFill size={20} className="text-green-400"></GoDotFill>}
+                        </div> 
                     </DropdownTrigger>
                     <DropdownMenu aria-label="Static Actions" className="w-[200px]" >
                         {userParametersPath.map((x) =><DropdownItem onPress={()=>setStyle(x)}>{'Style ' + pathToName(x)}</DropdownItem>)}
-                        <DropdownItem  className="text-black text-lg flex flex-row" color="warning" onPress={()=>{setMode('editing'); navigate('/edit')}}> Add a Style <FiPlus size={15}/> </DropdownItem>
+                        {!isCheckingS3.checking ? 
+                        <DropdownItem  className="text-black text-lg"  onPress={()=>{setMode('editing'); navigate('/edit')}} endContent={<FiPlus size={20}/>}>Add Style</DropdownItem>
+                        :
+                        <DropdownItem  className="text-black text-lg flex flex-row" isDisabled={true}> Elaborating Style </DropdownItem>
+                        }
                      </DropdownMenu>
                 </Dropdown>
             : 
